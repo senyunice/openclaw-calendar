@@ -2,12 +2,14 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>OpenClaw Calendar</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             color: #fff;
@@ -15,248 +17,298 @@
         }
         .header {
             text-align: center;
-            padding: 30px 0;
+            padding: 20px 0;
+            margin-bottom: 20px;
         }
         .header h1 {
-            color: #4ecca3;
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 24px;
+            color: #00d9ff;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
         }
         .calendar {
-            max-width: 400px;
-            margin: 0 auto;
             background: rgba(255,255,255,0.1);
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 20px;
+            backdrop-filter: blur(10px);
         }
-        .month {
+        .month-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        .month h2 { font-size: 20px; }
-        .month button {
-            background: #4ecca3;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #1a1a2e;
+        .month-title {
+            font-size: 20px;
             font-weight: bold;
+        }
+        .nav-btn {
+            background: rgba(0, 217, 255, 0.2);
+            border: none;
+            color: #00d9ff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .weekday {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            padding: 5px;
         }
         .days {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 5px;
-            text-align: center;
-        }
-        .day-header {
-            color: #888;
-            font-size: 12px;
-            padding: 10px 0;
         }
         .day {
-            padding: 10px;
-            border-radius: 8px;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 14px;
         }
-        .day:hover { background: rgba(78,204,163,0.2); }
-        .day.today { border: 2px solid #45b7d1; }
-        .day.selected { background: #4ecca3; color: #1a1a2e; }
-        .day.other-month { opacity: 0.3; }
-        .tasks {
+        .day:hover {
+            background: rgba(0, 217, 255, 0.2);
+        }
+        .day.today {
+            background: #00d9ff;
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+        .day.other-month {
+            color: #555;
+        }
+        .day.selected {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        .events {
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
-        .tasks h3 { color: #4ecca3; margin-bottom: 15px; }
-        .task {
-            background: rgba(255,255,255,0.05);
-            padding: 12px;
-            border-radius: 8px;
+        .events h3 {
+            color: #00d9ff;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
         }
-        .task input {
-            margin-right: 10px;
-            width: 20px;
-            height: 20px;
+        .event-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
-        .task.completed span { text-decoration: line-through; opacity: 0.5; }
-        .add-task {
-            display: flex;
-            margin-top: 15px;
+        .add-event {
+            margin-top: 20px;
         }
-        .add-task input {
-            flex: 1;
+        .add-event input {
+            width: 100%;
             padding: 12px;
             border: none;
-            border-radius: 8px 0 0 8px;
+            border-radius: 10px;
             background: rgba(255,255,255,0.1);
             color: #fff;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
-        .add-task button {
-            background: #4ecca3;
+        .add-event input::placeholder {
+            color: #888;
+        }
+        .add-event button {
+            width: 100%;
+            padding: 12px;
             border: none;
-            padding: 12px 20px;
-            border-radius: 0 8px 8px 0;
-            cursor: pointer;
+            border-radius: 10px;
+            background: #00d9ff;
             color: #1a1a2e;
+            font-size: 14px;
             font-weight: bold;
+            cursor: pointer;
+        }
+        .clock {
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #00d9ff;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>📅 OpenClaw Calendar</h1>
-        <p>任务日历</p>
     </div>
     
+    <div class="clock" id="clock">00:00:00</div>
+    
     <div class="calendar">
-        <div class="month">
-            <button onclick="prevMonth()">◀</button>
-            <h2 id="monthLabel">2026年3月</h2>
-            <button onclick="nextMonth()">▶</button>
+        <div class="month-nav">
+            <button class="nav-btn" onclick="prevMonth()">◀</button>
+            <span class="month-title" id="monthTitle">2026年3月</span>
+            <button class="nav-btn" onclick="nextMonth()">▶</button>
         </div>
         
-        <div class="days">
-            <div class="day-header">日</div>
-            <div class="day-header">一</div>
-            <div class="day-header">二</div>
-            <div class="day-header">三</div>
-            <div class="day-header">四</div>
-            <div class="day-header">五</div>
-            <div class="day-header">六</div>
+        <div class="weekdays">
+            <div class="weekday">日</div>
+            <div class="weekday">一</div>
+            <div class="weekday">二</div>
+            <div class="weekday">三</div>
+            <div class="weekday">四</div>
+            <div class="weekday">五</div>
+            <div class="weekday">六</div>
         </div>
         
-        <div class="days" id="calendarDays"></div>
+        <div class="days" id="days"></div>
         
-        <div class="tasks">
-            <h3 id="taskDate">3月10日 任务</h3>
-            <div id="taskList"></div>
-            <div class="add-task">
-                <input type="text" id="newTask" placeholder="添加新任务...">
-                <button onclick="addTask()">添加</button>
-            </div>
+        <div class="events" id="events">
+            <h3>📋 今日事件</h3>
+            <div id="eventList"></div>
+        </div>
+        
+        <div class="add-event">
+            <input type="text" id="eventInput" placeholder="添加新事件...">
+            <button onclick="addEvent()">➕ 添加事件</button>
         </div>
     </div>
 
     <script>
         let currentDate = new Date();
         let selectedDate = new Date();
-        let tasks = JSON.parse(localStorage.getItem('calendarTasks') || '{}');
-        
-        function render() {
+        let events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
+
+        function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             
-            document.getElementById('monthLabel').textContent = 
+            document.getElementById('monthTitle').textContent = 
                 `${year}年${month + 1}月`;
             
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
             const startDay = firstDay.getDay();
-            const daysInMonth = lastDay.getDate();
+            const totalDays = lastDay.getDate();
             
-            let html = '';
             const today = new Date();
+            const daysDiv = document.getElementById('days');
+            daysDiv.innerHTML = '';
             
             // Previous month days
-            const prevMonthDays = new Date(year, month, 0).getDate();
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
             for (let i = startDay - 1; i >= 0; i--) {
-                html += `<div class="day other-month">${prevMonthDays - i}</div>`;
+                const day = document.createElement('div');
+                day.className = 'day other-month';
+                day.textContent = prevMonthLastDay - i;
+                daysDiv.appendChild(day);
             }
             
             // Current month days
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                let classes = 'day';
-                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                    classes += ' today';
+            for (let i = 1; i <= totalDays; i++) {
+                const day = document.createElement('div');
+                day.className = 'day';
+                day.textContent = i;
+                
+                if (today.getFullYear() === year && 
+                    today.getMonth() === month && 
+                    today.getDate() === i) {
+                    day.classList.add('today');
                 }
-                if (i === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) {
-                    classes += ' selected';
+                
+                if (selectedDate.getFullYear() === year && 
+                    selectedDate.getMonth() === month && 
+                    selectedDate.getDate() === i) {
+                    day.classList.add('selected');
                 }
-                html += `<div class="${classes}" onclick="selectDate(${year}, ${month}, ${i})">${i}</div>`;
+                
+                day.onclick = () => selectDate(year, month, i);
+                daysDiv.appendChild(day);
             }
             
             // Next month days
-            const remaining = 42 - (startDay + daysInMonth);
-            for (let i = 1; i <= remaining; i++) {
-                html += `<div class="day other-month">${i}</div>`;
+            const remainingDays = 42 - (startDay + totalDays);
+            for (let i = 1; i <= remainingDays; i++) {
+                const day = document.createElement('div');
+                day.className = 'day other-month';
+                day.textContent = i;
+                daysDiv.appendChild(day);
             }
             
-            document.getElementById('calendarDays').innerHTML = html;
-            renderTasks();
+            renderEvents();
         }
-        
+
         function selectDate(year, month, day) {
             selectedDate = new Date(year, month, day);
-            render();
+            renderCalendar();
         }
-        
+
         function prevMonth() {
             currentDate.setMonth(currentDate.getMonth() - 1);
-            render();
+            renderCalendar();
         }
-        
+
         function nextMonth() {
             currentDate.setMonth(currentDate.getMonth() + 1);
-            render();
+            renderCalendar();
         }
-        
-        function renderTasks() {
-            const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth()+1).padStart(2,'0')}-${String(selectedDate.getDate()).padStart(2,'0')}`;
-            const dateLabel = `${selectedDate.getMonth()+1}月${selectedDate.getDate()}日`;
-            document.getElementById('taskDate').textContent = `${dateLabel} 任务`;
+
+        function getEventKey(date) {
+            return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        }
+
+        function renderEvents() {
+            const key = getEventKey(selectedDate);
+            const eventList = events[key] || [];
+            const eventListDiv = document.getElementById('eventList');
             
-            const dayTasks = tasks[dateStr] || [];
-            let html = '';
-            dayTasks.forEach((task, index) => {
-                html += `
-                    <div class="task ${task.completed ? 'completed' : ''}">
-                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                            onchange="toggleTask('${dateStr}', ${index})">
-                        <span>${task.title}</span>
-                    </div>
-                `;
-            });
-            if (dayTasks.length === 0) {
-                html = '<p style="color:#666;text-align:center;">暂无任务</p>';
+            if (eventList.length === 0) {
+                eventListDiv.innerHTML = '<div class="event-item">暂无事件</div>';
+            } else {
+                eventListDiv.innerHTML = eventList.map((event, index) => 
+                    `<div class="event-item">${event} <button onclick="deleteEvent(${index})" style="float:right;background:none;border:none;color:#ff6b6b;cursor:pointer;">✕</button></div>`
+                ).join('');
             }
-            document.getElementById('taskList').innerHTML = html;
         }
-        
-        function addTask() {
-            const input = document.getElementById('newTask');
-            const title = input.value.trim();
-            if (!title) return;
+
+        function addEvent() {
+            const input = document.getElementById('eventInput');
+            const event = input.value.trim();
+            if (!event) return;
             
-            const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth()+1).padStart(2,'0')}-${String(selectedDate.getDate()).padStart(2,'0')}`;
-            
-            if (!tasks[dateStr]) tasks[dateStr] = [];
-            tasks[dateStr].push({ title, completed: false });
-            localStorage.setItem('calendarTasks', JSON.stringify(tasks));
+            const key = getEventKey(selectedDate);
+            if (!events[key]) events[key] = [];
+            events[key].push(event);
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
             
             input.value = '';
-            renderTasks();
+            renderEvents();
         }
-        
-        function toggleTask(dateStr, index) {
-            tasks[dateStr][index].completed = !tasks[dateStr][index].completed;
-            localStorage.setItem('calendarTasks', JSON.stringify(tasks));
-            renderTasks();
+
+        function deleteEvent(index) {
+            const key = getEventKey(selectedDate);
+            events[key].splice(index, 1);
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+            renderEvents();
         }
-        
-        // Enter key to add task
-        document.getElementById('newTask').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') addTask();
-        });
-        
-        render();
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = 
+                now.toLocaleTimeString('zh-CN', { hour12: false });
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+        renderCalendar();
     </script>
 </body>
 </html>
