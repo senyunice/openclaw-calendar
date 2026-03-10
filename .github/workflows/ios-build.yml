@@ -1,4 +1,4 @@
-name: Build iOS App
+name: Build iOS App with EAS
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       
@@ -18,24 +18,21 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: |
-          npm install
-          
-      - name: Generate native iOS project
-        run: npx expo prebuild --platform ios --clean
+        run: npm install
         
-      - name: Install CocoaPods
-        run: |
-          cd ios
-          pod install
-        
-      - name: Build iOS project
-        run: |
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Debug -destination "platform=iOS Simulator,name=iPhone 14" build
-        
-      - name: Upload IPA
-        uses: actions/upload-artifact@v3
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
         with:
-          name: openclaw-calendar.ipa
-          path: ios/build/Build/Products/Debug-iphonesimulator/Runner.app
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: Build iOS with EAS
+        run: npx expo build:ios -t simulator
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ios-build
+          path: ./ios-results
