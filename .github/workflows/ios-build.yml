@@ -1,0 +1,38 @@
+name: Build iOS App with EAS
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: Build iOS with EAS
+        run: npx expo build:ios -t simulator
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ios-build
+          path: ./ios-results
