@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "OpenClaw Calendar",
+    "slug": "openclaw-calendar",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#1a1a2e"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.openclaw.calendar"
+    },
+    "android": {
+      "package": "com.openclaw.calendar"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "openclaw-calendar"
+      }
+    },
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}
